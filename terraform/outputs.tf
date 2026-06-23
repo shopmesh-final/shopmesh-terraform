@@ -165,10 +165,15 @@ output "irsa_grafana_role_arn" {
   value       = module.irsa.grafana_role_arn
 }
 
-# ─── ALB Target Group ARN for TargetGroupBinding ─────────────────────────
+# ─── ALB Target Group ARNs for TargetGroupBinding ────────────────────────
 output "frontend_target_group_arn" {
   description = "Frontend ALB target group ARN — ip type, used by EKS TargetGroupBinding"
   value       = module.alb.frontend_target_group_arn
+}
+
+output "grafana_target_group_arn" {
+  description = "Grafana ALB target group ARN — ip type, used by EKS TargetGroupBinding in monitoring ns"
+  value       = module.alb.grafana_target_group_arn
 }
 
 # ─── GitHub Actions ───────────────────────────────────────────────────────
