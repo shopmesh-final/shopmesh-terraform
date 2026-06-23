@@ -8,3 +8,4 @@ output "aws_lb_controller_role_arn" { value = aws_iam_role.aws_lb_controller.arn
 output "cloudwatch_agent_role_arn" { value = aws_iam_role.cloudwatch_agent.arn }
 output "fluent_bit_role_arn" { value = aws_iam_role.fluent_bit.arn }
 output "ebs_csi_role_arn" { value = aws_iam_role.ebs_csi.arn }
+output "grafana_role_arn" { value = aws_iam_role.grafana.arn }

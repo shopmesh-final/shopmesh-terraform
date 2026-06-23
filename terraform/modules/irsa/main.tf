@@ -23,6 +23,7 @@ data "aws_iam_policy_document" "irsa_trust" {
     cloudwatch-agent     = "system:serviceaccount:amazon-cloudwatch:cloudwatch-agent"
     fluent-bit           = "system:serviceaccount:amazon-cloudwatch:fluent-bit"
     ebs-csi-controller   = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+    grafana              = "system:serviceaccount:monitoring:monitoring-grafana"
   }
 
   statement {
@@ -521,4 +522,56 @@ resource "aws_iam_role" "ebs_csi" {
 resource "aws_iam_role_policy_attachment" "ebs_csi_policy" {
   role       = aws_iam_role.ebs_csi.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+# ─── Grafana (CloudWatch datasource via IRSA) ─────────────────────────────
+resource "aws_iam_role" "grafana" {
+  name               = "${var.project_name}-irsa-grafana"
+  assume_role_policy = data.aws_iam_policy_document.irsa_trust["grafana"].json
+  tags               = { Name = "${var.project_name}-irsa-grafana" }
+}
+
+resource "aws_iam_role_policy" "grafana" {
+  name = "grafana-cloudwatch-policy"
+  role = aws_iam_role.grafana.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:DescribeAlarmsForMetric",
+          "cloudwatch:DescribeAlarmHistory",
+          "cloudwatch:DescribeAlarms",
+          "cloudwatch:ListMetrics",
+          "cloudwatch:GetMetricData",
+          "cloudwatch:GetInsightRuleReport",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:GetLogGroupFields",
+          "logs:StartQuery",
+          "logs:StopQuery",
+          "logs:GetQueryResults",
+          "logs:GetLogEvents",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeTags",
+          "ec2:DescribeInstances",
+          "ec2:DescribeRegions",
+          "tag:GetResources",
+        ]
+        Resource = "*"
+      },
+    ]
+  })
 }

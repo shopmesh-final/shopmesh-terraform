@@ -160,6 +160,11 @@ output "irsa_ebs_csi_role_arn" {
   value = module.irsa.ebs_csi_role_arn
 }
 
+output "irsa_grafana_role_arn" {
+  description = "Grafana IAM role ARN — used for CloudWatch datasource via IRSA"
+  value       = module.irsa.grafana_role_arn
+}
+
 # ─── ALB Target Group ARN for TargetGroupBinding ─────────────────────────
 output "frontend_target_group_arn" {
   description = "Frontend ALB target group ARN — ip type, used by EKS TargetGroupBinding"
