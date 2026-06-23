@@ -4,12 +4,12 @@ name: Terraform Infrastructure
 on:
   pull_request:
     paths:
-      - 'aws-terraform/terraform/**'
+      - 'terraform/**'
   push:
     branches:
       - main
     paths:
-      - 'aws-terraform/terraform/**'
+      - 'terraform/**'
   workflow_dispatch:
 
 # Prevent concurrent Terraform operations on the same ref.
@@ -27,7 +27,7 @@ permissions:
 # ─── Global env ──────────────────────────────────────────────────────────────
 env:
   TF_VERSION: '1.9.0'
-  TF_WORKING_DIR: aws-terraform/terraform
+  TF_WORKING_DIR: terraform
   AWS_REGION: us-east-1
   TF_PLUGIN_CACHE_DIR: ~/.terraform.d/plugin-cache
 
