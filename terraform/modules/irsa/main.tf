@@ -297,9 +297,9 @@ resource "aws_iam_role_policy" "aws_lb_controller" {
         }
       },
       {
-        Effect    = "Allow"
-        Action    = ["eks:DescribeCluster"]
-        Resource  = "arn:aws:eks:*:*:cluster/*"
+        Effect   = "Allow"
+        Action   = ["eks:DescribeCluster"]
+        Resource = "arn:aws:eks:*:*:cluster/*"
       },
       {
         Effect = "Allow"

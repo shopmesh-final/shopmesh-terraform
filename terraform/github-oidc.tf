@@ -78,3 +78,34 @@ resource "aws_iam_role_policy" "github_actions_ecr" {
     ]
   })
 }
+
+# ─── Terraform CI Role ────────────────────────────────────────────────────
+# Assumed by GitHub Actions in shopmesh-final/shopmesh-terraform only.
+# Needs AdministratorAccess to create/modify IAM, EKS, VPC, ALB, S3, etc.
+resource "aws_iam_role" "terraform_ci" {
+  name = "${local.project_name}-terraform-ci-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Federated = aws_iam_openid_connect_provider.github_actions.arn }
+      Action    = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" = "repo:shopmesh-final/shopmesh-terraform:*"
+        }
+        StringEquals = {
+          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+
+  tags = { Name = "${local.project_name}-terraform-ci-role" }
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_ci_admin" {
+  role       = aws_iam_role.terraform_ci.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}

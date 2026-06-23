@@ -14,7 +14,7 @@ data "aws_secretsmanager_secret" "aws_config" {
 #   name                    = "${var.project_name}/jwt-secret"
 #   description             = "JWT signing secret for ShopMesh authentication"
 #   recovery_window_in_days = 7
-  
+
 #   lifecycle {
 #     prevent_destroy = true
 #   }
@@ -29,7 +29,7 @@ data "aws_secretsmanager_secret" "aws_config" {
 #   secret_string = jsonencode({
 #     jwt_secret = "ShopMeshDemoJWTSecret2026!"
 #   })
-  
+
 #   lifecycle {
 #     ignore_changes = [secret_string]
 #   }
@@ -41,7 +41,7 @@ data "aws_secretsmanager_secret" "aws_config" {
 #   name                    = "${var.project_name}/app-config"
 #   description             = "Application configuration for ShopMesh"
 #   recovery_window_in_days = 7
-  
+
 #   lifecycle {
 #     prevent_destroy = true
 #   }
@@ -60,7 +60,7 @@ data "aws_secretsmanager_secret" "aws_config" {
 #     dynamodb_orders_table   = "${var.project_name}-orders"
 #     aws_region              = var.aws_region
 #   })
-  
+
 #   lifecycle {
 #     ignore_changes = [secret_string]
 #   }
