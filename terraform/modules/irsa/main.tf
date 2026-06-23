@@ -235,14 +235,9 @@ resource "aws_iam_role_policy" "ai_assistant_service" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "bedrock:Converse",
-          "bedrock:ConverseStream",
-          "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream",
-        ]
-        Resource = local.bedrock_model_arns
+        Effect   = "Allow"
+        Action   = ["sts:AssumeRole"]
+        Resource = ["arn:aws:iam::686591366739:role/shopmesh-bedrock-cross-account"]
       },
     ]
   })
