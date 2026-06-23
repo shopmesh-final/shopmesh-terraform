@@ -62,6 +62,28 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 0
   }
 
+  # Grafana: no caching, forward all cookies + headers (required for CSRF and session)
+  ordered_cache_behavior {
+    path_pattern           = "/grafana*"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "external-alb"
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = false
+
+    forwarded_values {
+      query_string = true
+      headers      = ["*"]
+      cookies {
+        forward = "all"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
+  }
+
   # Static assets: long cache
   ordered_cache_behavior {
     path_pattern           = "/static/*"
