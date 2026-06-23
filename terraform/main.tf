@@ -271,71 +271,46 @@ resource "aws_security_group_rule" "alb_to_pods" {
   description              = "Allow external ALB health checks and traffic to pods (TargetGroupBinding ip type)"
 }
 
-# ─── Route53 A Records (ALB alias — direct, no CloudFront) ──────────────────
+# ─── CloudFront ───────────────────────────────────────────────────────────
+# CloudFront terminates HTTPS (ACM cert in us-east-1) and connects to ALB on
+# port 80. /api/* paths bypass caching; /static/* gets a 1-year TTL.
+module "cloudfront" {
+  source                 = "./modules/cloudfront"
+  project_name           = local.project_name
+  external_alb_dns_name  = module.alb.external_alb_dns_name
+  cloudfront_logs_bucket = module.s3.cloudfront_logs_bucket_name
+  price_class            = var.cloudfront_price_class
+  certificate_arn        = aws_acm_certificate_validation.cloudfront.certificate_arn
+  domain_name            = var.domain_name
+
+  depends_on = [module.alb, aws_acm_certificate_validation.cloudfront]
+}
+
+# ─── Route53 A Records (CloudFront alias) ─────────────────────────────────
 resource "aws_route53_record" "apex" {
   zone_id = module.route53.zone_id
   name    = var.domain_name
   type    = "A"
 
   alias {
-    name                   = module.alb.external_alb_dns_name
-    zone_id                = module.alb.external_alb_zone_id
-    evaluate_target_health = true
+    name                   = module.cloudfront.cloudfront_domain_name
+    zone_id                = "Z2FDTNDATAQYW2"
+    evaluate_target_health = false
   }
 }
 
 resource "aws_route53_record" "www" {
+  count   = var.create_www_record ? 1 : 0
   zone_id = module.route53.zone_id
   name    = "www.${var.domain_name}"
   type    = "A"
 
   alias {
-    name                   = module.alb.external_alb_dns_name
-    zone_id                = module.alb.external_alb_zone_id
-    evaluate_target_health = true
+    name                   = module.cloudfront.cloudfront_domain_name
+    zone_id                = "Z2FDTNDATAQYW2"
+    evaluate_target_health = false
   }
 }
-
-# # ─── CloudFront ───────────────────────────────────────────────────────────
-# module "cloudfront" {
-#   source                 = "./modules/cloudfront"
-#   project_name           = local.project_name
-#   external_alb_dns_name  = module.alb.external_alb_dns_name
-#   cloudfront_logs_bucket = module.s3.cloudfront_logs_bucket_name
-#   price_class            = var.cloudfront_price_class
-#   certificate_arn        = aws_acm_certificate_validation.cloudfront.certificate_arn
-#   domain_name            = var.domain_name
-# }
-
-# ─── Route53 A Records (CloudFront alias) ─────────────────────────────────
-# Created after both module.route53 (zone) and module.cloudfront (distribution)
-# are ready. This avoids the circular dependency that would occur if these
-# records lived inside the route53 module.
-
-# resource "aws_route53_record" "cloudfront_alias" {
-#   zone_id = module.route53.zone_id
-#   name    = var.domain_name
-#   type    = "A"
-
-#   alias {
-#     name                   = module.cloudfront.cloudfront_domain_name
-#     zone_id                = "Z2FDTNDATAQYW2" # CloudFront hosted zone ID (fixed AWS constant)
-#     evaluate_target_health = false
-#   }
-# }
-
-# resource "aws_route53_record" "www_alias" {
-#   count   = var.create_www_record ? 1 : 0
-#   zone_id = module.route53.zone_id
-#   name    = "www.${var.domain_name}"
-#   type    = "A"
-
-#   alias {
-#     name                   = module.cloudfront.cloudfront_domain_name
-#     zone_id                = "Z2FDTNDATAQYW2"
-#     evaluate_target_health = false
-#   }
-# }
 
 # ─── CloudWatch Alarms, Dashboard & Log Groups ────────────────────────────
 module "cloudwatch" {

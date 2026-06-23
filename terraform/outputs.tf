@@ -20,16 +20,16 @@ output "external_alb_dns_name" {
   value       = module.alb.external_alb_dns_name
 }
 
-# # ─── CloudFront ───────────────────────────────────────────────────────────
-# output "cloudfront_domain_name" {
-#   description = "CloudFront distribution domain — use this URL to access the application"
-#   value       = module.cloudfront.cloudfront_domain_name
-# }
+# ─── CloudFront ───────────────────────────────────────────────────────────
+output "cloudfront_domain_name" {
+  description = "CloudFront distribution domain — use this URL to access the application"
+  value       = module.cloudfront.cloudfront_domain_name
+}
 
-# output "cloudfront_distribution_id" {
-#   description = "CloudFront distribution ID"
-#   value       = module.cloudfront.cloudfront_distribution_id
-# }
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID"
+  value       = module.cloudfront.cloudfront_distribution_id
+}
 
 # ─── DynamoDB ─────────────────────────────────────────────────────────────
 output "dynamodb_users_table" {
