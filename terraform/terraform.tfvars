@@ -25,5 +25,5 @@ create_www_record = true
 eks_cluster_version    = "1.30"
 eks_node_instance_type = ["t3.medium"]
 eks_node_min_size      = 2
-eks_node_desired_size  = 3
+eks_node_desired_size  = 4
 eks_node_max_size      = 6
