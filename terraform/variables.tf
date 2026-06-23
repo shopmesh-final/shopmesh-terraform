@@ -88,11 +88,11 @@ variable "eks_node_min_size" {
 variable "eks_node_desired_size" {
   description = "Desired number of EKS worker nodes"
   type        = number
-  default     = 3
+  default     = 4
 }
 
 variable "eks_node_max_size" {
   description = "Maximum number of EKS worker nodes"
   type        = number
-  default     = 6
+  default     = 5
 }
