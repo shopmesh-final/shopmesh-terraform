@@ -83,14 +83,9 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 31536000
   }
 
-  # Custom error pages: serve index.html for React Router
-  custom_error_response {
-    error_code            = 403
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 0
-  }
-
+  # Only remap 404 for SPA deep-links — nginx handles /api/* errors correctly.
+  # 403 intentionally NOT remapped: CloudFront security blocks (WAF etc.) should
+  # surface as 403, not silently rewrite to 200/index.html.
   custom_error_response {
     error_code            = 404
     response_code         = 200
