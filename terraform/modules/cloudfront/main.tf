@@ -4,7 +4,7 @@ resource "aws_cloudfront_distribution" "main" {
   default_root_object = "index.html"
   price_class         = var.price_class
   comment             = "${var.project_name} CloudFront Distribution"
-  aliases             = [var.domain_name]
+  aliases             = var.domain_name != "" ? [var.domain_name] : []
 
   # Origin: External ALB — HTTPS only (ALB listener now serves 443)
   origin {
@@ -112,10 +112,12 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = var.certificate_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    cloudfront_default_certificate = var.domain_name == ""
+    acm_certificate_arn            = var.domain_name != "" ? var.certificate_arn : null
+    ssl_support_method             = var.domain_name != "" ? "sni-only" : null
+    minimum_protocol_version       = var.domain_name != "" ? "TLSv1.2_2021" : null
   }
 
   tags = { Name = "${var.project_name}-cloudfront" }
 }
+##

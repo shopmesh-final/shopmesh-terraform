@@ -16,8 +16,9 @@ variable "price_class" {
 }
 
 variable "certificate_arn" {
-  description = "ARN of validated ACM certificate in us-east-1 for CloudFront"
+  description = "ARN of validated ACM certificate in us-east-1 for CloudFront. Empty string when bootstrapping without a custom domain."
   type        = string
+  default     = ""
 }
 
 variable "domain_name" {
