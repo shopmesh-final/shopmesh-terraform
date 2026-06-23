@@ -271,6 +271,16 @@ resource "aws_security_group_rule" "alb_to_pods" {
   description              = "Allow external ALB health checks and traffic to pods (TargetGroupBinding ip type)"
 }
 
+resource "aws_security_group_rule" "alb_to_grafana" {
+  type                     = "ingress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  source_security_group_id = module.security_groups.external_alb_sg_id
+  security_group_id        = module.eks.cluster_security_group_id
+  description              = "Allow ALB to reach Grafana pods on port 3000 (TargetGroupBinding ip type)"
+}
+
 # ─── CloudFront ───────────────────────────────────────────────────────────
 # CloudFront terminates HTTPS (ACM cert in us-east-1) and connects to ALB on
 # port 80. /api/* paths bypass caching; /static/* gets a 1-year TTL.

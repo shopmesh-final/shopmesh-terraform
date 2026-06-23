@@ -61,3 +61,59 @@ resource "aws_lb_listener" "external_https" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
+
+# Grafana TG — ip type, registered by TargetGroupBinding CRD (AWS Load Balancer Controller)
+resource "aws_lb_target_group" "grafana" {
+  name        = "${var.project_name}-grafana-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    path                = "/grafana/api/health"
+    protocol            = "HTTP"
+    port                = "traffic-port"
+    healthy_threshold   = 2
+    unhealthy_threshold = 5
+    timeout             = 10
+    interval            = 30
+    matcher             = "200"
+  }
+
+  tags = { Name = "${var.project_name}-grafana-tg" }
+}
+
+# Route /grafana and /grafana/* to Grafana before the default frontend catch-all
+resource "aws_lb_listener_rule" "grafana_http" {
+  listener_arn = aws_lb_listener.external_http.arn
+  priority     = 100
+
+  condition {
+    path_pattern {
+      values = ["/grafana", "/grafana/*"]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.grafana.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "grafana_https" {
+  listener_arn = aws_lb_listener.external_https.arn
+  priority     = 100
+
+  condition {
+    path_pattern {
+      values = ["/grafana", "/grafana/*"]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.grafana.arn
+  }
+}
