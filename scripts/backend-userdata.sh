@@ -2,7 +2,7 @@
 # ─── Backend EC2 User Data Script ─────────────────────────────────────────
 # Installs Docker + Docker Compose, configures environment from instance
 # metadata and SSM/Secrets Manager, and starts all 3 backend services.
-
+#
 set -euo pipefail
 
 # Template variables injected by Terraform templatefile()

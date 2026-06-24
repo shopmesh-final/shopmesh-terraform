@@ -208,14 +208,9 @@ resource "aws_iam_role_policy" "analytics_service" {
         ]
       },
       {
-        Effect = "Allow"
-        Action = [
-          "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream",
-          "bedrock:Converse",
-          "bedrock:ConverseStream",
-        ]
-        Resource = local.bedrock_model_arns
+        Effect   = "Allow"
+        Action   = ["sts:AssumeRole"]
+        Resource = ["arn:aws:iam::686591366739:role/shopmesh-bedrock-cross-account"]
       },
     ]
   })
